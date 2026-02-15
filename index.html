@@ -7,13 +7,25 @@
     <script src="jquery-4.0.0.min.js"></script>
 </head>
 <body>
-    <div class="result">
-
-    </div>
+    <div id="releases-id"></div>
     <script>
-        datas = $.get('https://api.github.com/repos/RizqullahY/scraping-project-results/releases', () => {
-        })
-        for(data on datas)
+        $(document).ready(function() {
+            const apiURL = 'https://api.github.com/repos/RizqullahY/scraping-project-results/releases';
+            $.getJSON(apiURL, function(releases) {
+                $.each(releases, function(index, release) {
+                    const releasesHtml = `
+                        <div class="user-panel">
+                            <h3>${release.name}</h3>
+                            ${release.body}
+                        </div>
+                    `;
+                    $('#releases-id').append(releasesHtml); //
+                });
+            }).fail(function(jqxhr, textStatus, error) {
+                const err = textStatus + ", " + error;
+                $('#releases-id').append(`<p>Request Failed: ${err}</p>`);
+            });
+        });
     </script>
 </body>
 </html>
