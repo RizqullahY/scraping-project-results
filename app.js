@@ -15,6 +15,29 @@ $(function () {
     return match ? match[1] : "";
   }
 
+  async function loadAllPagesForSearch() {
+    if (!hasMore) return;
+
+    while (hasMore) {
+      currentPage++;
+      await new Promise((resolve) => {
+        $.getJSON(
+          `https://api.github.com/repos/${repo}/releases?page=${currentPage}&per_page=${perPage}`,
+          function (data) {
+            if (data.length < perPage) {
+              hasMore = false;
+            }
+
+            cache[currentPage] = data;
+            allData = allData.concat(data);
+            resolve();
+          }
+        );
+      });
+    }
+  }
+
+
   function fetchReleases(page, reset = false) {
     if (isLoading || !hasMore) return;
 
@@ -100,14 +123,25 @@ $(function () {
     fetchReleases(1, true);
   });
 
-  $("#search").on("input", function () {
+  $("#search").on("input", async function () {
     const keyword = $(this).val().toLowerCase();
+
+    if (keyword.length === 0) {
+      $("#releaseList").empty();
+      render(allData.slice(0, currentPage * perPage));
+      return;
+    }
+
+    if (hasMore) {
+      await loadAllPagesForSearch();
+    }
+
     $("#releaseList").empty();
 
     const filtered = allData.filter(
       (r) =>
         (r.name && r.name.toLowerCase().includes(keyword)) ||
-        (r.tag_name && r.tag_name.toLowerCase().includes(keyword)),
+        (r.tag_name && r.tag_name.toLowerCase().includes(keyword))
     );
 
     render(filtered);
