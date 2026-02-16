@@ -1,31 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script src="jquery-4.0.0.min.js"></script>
-</head>
-<body>
-    <div id="releases-id"></div>
-    <script>
-        $(document).ready(function() {
-            const apiURL = 'https://api.github.com/repos/RizqullahY/scraping-project-results/releases';
-            $.getJSON(apiURL, function(releases) {
-                $.each(releases, function(index, release) {
-                    const releasesHtml = `
-                        <div class="user-panel">
-                            <h3>${release.name}</h3>
-                            ${release.body}
-                        </div>
-                    `;
-                    $('#releases-id').append(releasesHtml); //
-                });
-            }).fail(function(jqxhr, textStatus, error) {
-                const err = textStatus + ", " + error;
-                $('#releases-id').append(`<p>Request Failed: ${err}</p>`);
-            });
-        });
-    </script>
-</body>
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Releases</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  </head>
+  <body class="bg-slate-900 text-slate-200 min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Project Releases</h1>
+        <button
+          id="refreshBtn"
+          class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl transition"
+        >
+          Refresh
+        </button>
+      </div>
+
+      <div class="mb-6">
+        <input
+          id="search"
+          type="text"
+          placeholder="Search release..."
+          class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div id="releaseList" class="grid md:grid-cols-2 gap-6"></div>
+
+      <div class="text-center mt-10">
+        <button
+          id="loadMore"
+          class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl transition"
+        >
+          Load More
+        </button>
+      </div>
+
+      <div id="loading" class="text-center mt-4 hidden text-slate-400">
+        Loading...
+      </div>
+    </div>
+
+    <div
+      id="assetModal"
+      class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 backdrop-blur-sm"
+    >
+      <div
+        class="bg-slate-800 w-full max-w-lg rounded-2xl p-6 relative shadow-2xl"
+      >
+        <button
+          id="closeModal"
+          class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg"
+        >
+          ✕
+        </button>
+
+        <h2 id="modalTitle" class="text-lg font-semibold mb-4"></h2>
+
+        <div
+          id="modalContent"
+          class="max-h-96 overflow-y-auto space-y-3 pr-2"
+        ></div>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
 </html>
